@@ -1,0 +1,4 @@
+[
+{% for v in videos %}{"fullpath": "{{ v.fullpath }}", "basename": "{{ v.basename }}", "thumbnail": "{{ v.thumbnail_basename }}"}{% if not loop.last %},{% endif %}
+{% endfor %}
+]

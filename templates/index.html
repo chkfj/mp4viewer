@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Encoded videos</title>
+
+    <!-- React -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+  </head>
+  <body>
+    <div id="content"></div>
+
+    <script type="text/babel">
+    var VideoBox = React.createClass({
+        getInitialState: function() {
+            return {data: []};
+        },
+        componentDidMount: function() {
+            $.ajax({
+                url: this.props.url,
+                dataType: 'json',
+                cache: false,
+                success: function(data) {
+                    this.setState({data: data});
+                }.bind(this),
+                error: function(xhr, status, err) {
+                    console.error(this.props.url, status, err.toString());
+                }.bind(this)
+            });
+        },
+        render: function() {
+            return (
+                <div className="videoBox">
+                    <h1>Encoded videos</h1>
+                    <VideoList data={this.state.data} />
+                </div>
+            );
+        }
+    });
+
+    var VideoList = React.createClass({
+        render: function() {
+            var videoNodes = this.props.data.map(function(video) {
+                return (
+                    <Video thumbnail={video.thumbnail}>{video.basename}</Video>
+                );
+            });
+            return (
+                <div className="videoList">
+                    {videoNodes}
+                </div>
+            );
+        }
+    });
+
+    var Video = React.createClass({
+        render: function() {
+            var a_extras = {};
+            var img_extras = {};
+            a_extras.href = "http://hostname/encoded/" + this.props.children;
+            img_extras.src = "http://hostname/encoded/" + this.props.thumbnail;
+            img_extras.width = "160";
+            img_extras.height = "90";
+            return (
+                <div className="video"><img {...img_extras} /><a {...a_extras}>{this.props.children}</a></div>
+            );
+        }
+    });
+    ReactDOM.render(
+        <VideoBox url="api/videos" />,
+        document.getElementById('content')
+    );
+    </script>
+
+  </body>
+</html>
+
